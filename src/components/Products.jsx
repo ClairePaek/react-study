@@ -6,11 +6,12 @@ import React, { useEffect, useState } from 'react';
  * 따라서 UseEffect로 한 번만 불러준다.
  */
 export default function Products() {
-  const [count, setCount] = useState(0);
   const [products, setProducts] = useState([]);
+  const [checked, setChecked] = useState(false);
+  const handleChanged = () => setChecked((prev) => !prev);
 
   useEffect(() => {
-    fetch('data/products.json')
+    fetch(`data/${checked ? 'sale_' : ''}products.json`)
       .then((res) => res.json())
       .then((data) => {
         console.log('call!');
@@ -21,13 +22,16 @@ export default function Products() {
     return () => {
       console.log('unmount!');
     };
-  }, []); //dependency list가 비어있는 경우 호출되는 처음 한 번만 호출된다.
+  }, [checked]); //dependency list가 비어있는 경우 호출되는 처음 한 번만 호출된다.
 
   return (
     <>
+      <input type="checkbox" value={checked} onChange={handleChanged}></input>
+      <label htmlFor="checkbox">Show Only Hot Sale</label>
       <ul>
         {products.map((product) => (
           <li key={product.id}>
+            {/* map을 사용해서 list를 만들 때는고유한 key 값을 설정해주어야 한다. */}
             <article>
               <h3>{product.name}</h3>
               <p>{product.price}</p>
@@ -35,7 +39,6 @@ export default function Products() {
           </li>
         ))}
       </ul>
-      <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>
     </>
   );
 }
